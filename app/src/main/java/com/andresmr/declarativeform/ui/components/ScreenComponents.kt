@@ -17,8 +17,8 @@ import com.andresmr.declarativeform.ui.theme.DeclarativeFormTheme
 
 @Composable
 fun ScreenContainer(content: @Composable () -> Unit) {
-    DeclarativeFormTheme() {
-        Surface(color = Color.LightGray) {
+    DeclarativeFormTheme {
+        Surface(color = Color.White) {
             content()
         }
     }
@@ -59,31 +59,40 @@ fun CheckboxWithText(text: String, isSelected: Boolean, onChecked: (Boolean) -> 
 @Composable
 fun MessageList(
     messages: List<String>,
-    selectAll: Boolean
+    isSelected: Boolean,
+    modifier: Modifier
 ) {
-    LazyColumn(verticalArrangement = Arrangement.SpaceEvenly) {
+    LazyColumn(modifier = modifier) {
         items(messages) { message ->
             Item(
                 text = message,
-                selected = selectAll
+                selected = isSelected
             )
+            Divider(color = Color.LightGray)
         }
     }
 }
 
 @Composable
 fun Item(text: String, selected: Boolean) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        backgroundColor = when {
-            selected -> MaterialTheme.colors.secondary
-            else -> MaterialTheme.colors.surface
-        }
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.body2,
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
+            color = when {
+                selected -> MaterialTheme.colors.secondary
+                else -> Color.Black
+            }
         )
+    }
+}
+
+@Composable
+fun Counter(count: Int, updateCount: (Int) -> Unit) {
+    Button(onClick = { updateCount(count + 1) }) {
+        Text("I've been clicked $count times")
     }
 }
