@@ -2,31 +2,37 @@ package com.andresmr.declarativeform
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.andresmr.declarativeform.ui.components.*
+import androidx.compose.ui.unit.dp
+import com.andresmr.declarativeform.ui.components.HeaderImage
+import com.andresmr.declarativeform.ui.components.MessageList
+import com.andresmr.declarativeform.ui.components.ScreenContainer
 
 class MainActivity : AppCompatActivity() {
+
+    private val viewModel by viewModels<MainViewModel>()
+
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val viewModel: MainViewModel = viewModel()
             viewModel.uiState.observeAsState().value?.let { uiState ->
                 ScreenContainer {
-                    MainScreenContent(
-                        uiState = uiState,
-                        onChecked = { selected ->
-                            viewModel.onCheckChange(selected)
-                        }
-                    )
+                    MainScreenContent(uiState = uiState)
                 }
             }
         }
@@ -34,35 +40,38 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun MainScreenContent(uiState: MainState, onChecked: (Boolean) -> Unit) {
-    Column(modifier = Modifier.fillMaxHeight()) {
+fun MainScreenContent(uiState: MainState) {
 
-        val counterState = remember { mutableStateOf(0) }
+    Column(modifier = Modifier.fillMaxHeight()) {
 
         HeaderImage(resource = R.drawable.header)
 
-        CheckboxWithText(
-            text = uiState.title,
-            isSelected = uiState.allSelected,
-            onChecked = onChecked
+        Text(
+            uiState.title,
+            modifier = Modifier.padding(12.dp),
+            style = MaterialTheme.typography.h5,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold
         )
 
         MessageList(
             messages = uiState.messages,
-            isSelected = uiState.allSelected,
-            Modifier.weight(1f)
-        )
-
-        Counter(
-            count = counterState.value,
-            updateCount = { newCount ->
-                counterState.value = newCount
+            Modifier.apply {
+                padding(12.dp)
+                weight(1f)
+                fillMaxWidth()
             }
         )
     }
+
+    /*AnimatedVisibility(visible = saveAvailable.value) {
+        FloatingButton()
+    }*/
 }
 
 
+@ExperimentalAnimationApi
 @Preview(
     showBackground = true,
     name = "Main Screen Preview"
@@ -84,6 +93,6 @@ fun DefaultPreview() {
                 ),
                 false
             )
-        ) {}
+        )
     }
 }
